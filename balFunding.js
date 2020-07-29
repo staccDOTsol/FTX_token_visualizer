@@ -19,13 +19,14 @@ var theurl = process.env.theurl
 request.get('https://ftx.com/api/lt/tokens', function (e, r, d){
 	d = JSON.parse(d).result
 for (var token in d){
-if (d[token].description.indexOf('3X') != -1){	
+if (d[token].description.indexOf('3X') != -1 && d[token].description.indexOf('USDT') == -1 && d[token].name.indexOf('BEAR') == -1){	
 
+if (d[token].changeBod * 100 > 5 || d[token].changeBod * 100 < -5){
 if (tokenPrices[d[token].name] == undefined){
 	tokenPrices[d[token].name] = []
-}
+	}
 tokenPrices[d[token].name].push([new Date().getTime(), d[token].changeBod * 100])
-}
+}}
 }
 })
           	
