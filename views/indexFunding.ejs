@@ -4671,6 +4671,13 @@ Imaging with any questions regarding Web fonts:  http://webfonts.fonts.com
         gtag('config', 'UA-120452160-1');
     </script>
 <style>
+.tooltip {
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 2px;
+  fontSize: 4px; 
+} 
+
       table, th, td {
       padding: 10px;
       border: 1px solid black; 
@@ -5348,13 +5355,16 @@ Most recent LT values:
     
 
 <script>
-
     var tokenPrices = {}
     var tokenPriceStarts = {}
 
     var options = {
 
 
+    tooltip: {
+                useHTML: true,
+
+    },
 
         rangeSelector: {
             buttons: [{
@@ -5399,10 +5409,11 @@ Most recent LT values:
         series: [
         ]
     }
-            
+           var chart = Highcharts.stockChart('container', options);
+
 
     $(document).ready(function() {
-            var chart = Highcharts.stockChart('container', options);
+            
             var theurl = "<%=theurl%>"
     chart.addAxis({ // Secondary yAxis
         id: 'btc-axis',
@@ -5469,10 +5480,12 @@ if (tokenPrices[names[i]][0][1] > 5){
     chart.series[i].setData(tokenPrices[names[i]]);
 i++
 <%}%>
+
 $('#LTs').html(toout)
     
         setInterval(function() {
            $.getJSON('http://' + theurl + '/update?name=test', function(jsondata) {
+
             var toout = ""
 var i = 0;
 for (var name in jsondata.tokenPrices){
@@ -5504,7 +5517,6 @@ tokenPrices[name] = []
  chart.series[series].setData(tokenPrices[name]);
  }
  }
-               
                $('#LTs').html(toout)
 
 i++;
