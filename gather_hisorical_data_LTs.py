@@ -20,12 +20,12 @@ def threadedGather(lt):
 	print(lt)
 	ts = time.time()
 	ts = int(ts) * 1000
-	ts = ts - 1000 * 60 * 60 * 24 * 30 * 1
+	ts = ts - 1000 * 60 * 60 * 24 * 30 * 6
 	print(ts)
 
 	
 	first = True
-	while ts < int(time.time() * 1000- 1000 * 60 * 60 * 24):
+	while ts < int(time.time() * 1000- 1000 * 60 * 60 * 24 * 1):
 		if first != True: 
 			print(lt + ': ' + str(ts))
 		else:
@@ -40,7 +40,7 @@ def threadedGather(lt):
 			with open(lt.split('/')[0] + '.csv', mode) as myfile:
 				myfile.write(','.join(str(e) for e in ohlcv) + '\n')
 		if len(ohlcvs) < 500:
-			ts = int(time.time() * 1000)
+			ts = ts +  1000 * 60 * 60 * 24
 import threading
 
 for lt in lts:

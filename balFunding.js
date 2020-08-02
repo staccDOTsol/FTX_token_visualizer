@@ -1,5 +1,6 @@
 
 var tokenPrices = {}
+var bearPrices = {}
 var tokenPriceStarts = {}
 var first = true;
 const request = require('request')
@@ -21,12 +22,39 @@ request.get('https://ftx.com/api/lt/tokens', function (e, r, d){
 for (var token in d){
 if (d[token].description.indexOf('3X') != -1 && d[token].description.indexOf('USDT') == -1 && d[token].name.indexOf('BEAR') == -1){	
 
-if (d[token].changeBod * 100 > 5 || d[token].changeBod * 100 < -5){
+if (d[token].changeBod * 100 > 7){//|| d[token].changeBod * 100 < -7){
 if (tokenPrices[d[token].name] == undefined){
 	tokenPrices[d[token].name] = []
 	}
 tokenPrices[d[token].name].push([new Date().getTime(), d[token].changeBod * 100])
-}}
+}
+
+else {
+  if (tokenPrices[d[token].name] == undefined){
+  tokenPrices[d[token].name] = []
+  }
+tokenPrices[d[token].name].push([new Date().getTime(), 0])
+}
+
+}
+if (d[token].description.indexOf('3X') != -1 && d[token].description.indexOf('USDT') == -1 && d[token].name.indexOf('BULL') == -1){ 
+
+if (d[token].changeBod * 100 > 7){//|| d[token].changeBod * 100 < -7){
+if (bearPrices[d[token].name] == undefined){
+  bearPrices[d[token].name] = []
+  }
+bearPrices[d[token].name].push([new Date().getTime(), d[token].changeBod * 100])
+}
+
+else {
+  if (bearPrices[d[token].name] == undefined){
+  bearPrices[d[token].name] = []
+  }
+bearPrices[d[token].name].push([new Date().getTime(), 0])
+
+}
+
+}
 }
 })
           	
@@ -42,7 +70,11 @@ app.get('/update', cors(), (req, res) => {
 for (name in tokenPrices){
 tosend[name] = tokenPrices[name][tokenPrices[name].length-1]
 }
-    res.json({tokenPrices: tosend})
+tosend2 = {}
+for (name in bearPrices){
+tosend2[name] = bearPrices[name][bearPrices[name].length-1]
+}
+    res.json({tokenPrices: tosend, bearPrices: tosend2})
 
 
 
@@ -50,8 +82,10 @@ tosend[name] = tokenPrices[name][tokenPrices[name].length-1]
 
 app.get('/', (req, res) => {
 	console.log(tokenPrices)
+  console.log(bearPrices)
         res.render('indexFunding.ejs', {
             tokenPrices: tokenPrices,
+            bearPrices: bearPrices,
         theurl: theurl
         })
 

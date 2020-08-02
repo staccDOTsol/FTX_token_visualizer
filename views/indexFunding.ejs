@@ -1,3 +1,4 @@
+
 <head>
 
 
@@ -5171,6 +5172,8 @@ Imaging with any questions regarding Web fonts:  http://webfonts.fonts.com
 <div id='fee'></div>
 
 <div id="container" style="height: 500px; min-width: 310px"></div>
+<div id="container2" style="height: 500px; min-width: 310px"></div>
+
 Most recent LT values:
 <div id='LTs'></div>   
 
@@ -5356,6 +5359,7 @@ Most recent LT values:
 
 <script>
     var tokenPrices = {}
+    var bearPrices = {}
     var tokenPriceStarts = {}
 
     var options = {
@@ -5411,11 +5415,22 @@ Most recent LT values:
     }
            var chart = Highcharts.stockChart('container', options);
 
+var chart2 = Highcharts.stockChart('container2', options);
+
 
     $(document).ready(function() {
             
             var theurl = "<%=theurl%>"
     chart.addAxis({ // Secondary yAxis
+        id: 'btc-axis',
+        title: {
+            text: '% Delta'
+        },
+        lineWidth: 2,
+        lineColor: '#00FF00',
+        opposite: true
+    });
+    chart2.addAxis({ // Secondary yAxis
         id: 'btc-axis',
         title: {
             text: '% Delta'
@@ -5481,11 +5496,71 @@ if (tokenPrices[names[i]][0][1] > 5){
 i++
 <%}%>
 
+    /////////////////////////////
+
+i = 0
+names2 = []
+<%for(let el of Object.keys(bearPrices)){%>
+name = '<%=el%>'
+bearPrices[name] = []
+names2.push(name)
+<%}%>
+toout += "<br><br>"
+
+    <%for(let el of Object.values(bearPrices)){%>
+    array = []
+    console.log(names2[i])
+    counter = 0
+    console.log('<%=el%>')
+split = '<%=el%>'.split(',')
+for (var x = 1; x <= split.length; x = x + 2){
+    array.push([parseFloat(split[x-1]), parseFloat(split[x])])
+}
+console.log(array)
+
+
+bearPrices[names2[i]] = array
+ toout += "<br>" + names2[i] + ": %" + (Math.round(bearPrices[names2[i]][0][1]  * 1000)/1000)
+
+if (bearPrices[names2[i]][0][1] > 5){
+    chart2.addSeries({
+        name: names2[i],
+        type: 'line',
+        color: '#00FF00',
+        yAxis: 'btc-axis',
+        data: bearPrices[name]
+    });
+    }
+    else if (bearPrices[names2[i]][0][1] < -5){
+    chart2.addSeries({
+        name: names2[i],
+        type: 'line',
+        color: '#FF0000',
+        yAxis: 'btc-axis',
+        data: bearPrices[name]
+    });
+    }
+    else{
+    chart2.addSeries({
+        name: names2[i],
+        type: 'line',
+        color: 'black',
+        yAxis: 'btc-axis',
+        data: bearPrices[name]
+    });
+    }
+
+    chart2.series[i].setData(bearPrices[names2[i]]);
+i++
+<%}%>
+
 $('#LTs').html(toout)
     
+
+    /////////////////////////////
         setInterval(function() {
            $.getJSON('http://' + theurl + '/update?name=test', function(jsondata) {
-
+$('#LTs').html("")
             var toout = ""
 var i = 0;
 for (var name in jsondata.tokenPrices){
@@ -5493,7 +5568,7 @@ if (tokenPrices[name] == undefined){
 tokenPrices[name] = []
     if (jsondata.tokenPrices[name][1] > 5){
     chart.addSeries({
-        name: names[i],
+        name: name,
         type: 'line',
         color: '#00FF00',
         yAxis: 'btc-axis',
@@ -5502,7 +5577,7 @@ tokenPrices[name] = []
     }
     else if (jsondata.tokenPrices[name][1] < -5){
     chart.addSeries({
-        name: names[i],
+        name: name,
         type: 'line',
         color: '#FF0000',
         yAxis: 'btc-axis',
@@ -5517,10 +5592,45 @@ tokenPrices[name] = []
  chart.series[series].setData(tokenPrices[name]);
  }
  }
-               $('#LTs').html(toout)
 
 i++;
 }
+ toout += "<br><br>"
+i = 0;
+for (var name in jsondata.bearPrices){
+if (bearPrices[name] == undefined){
+bearPrices[name] = []
+    if (jsondata.bearPrices[name][1] > 5){
+    chart2.addSeries({
+        name: names[i],
+        type: 'line',
+        color: '#00FF00',
+        yAxis: 'btc-axis',
+        data: bearPrices[name]
+    });
+    }
+    else if (jsondata.bearPrices[name][1] < -5){
+    chart2.addSeries({
+        name: names[i],
+        type: 'line',
+        color: '#FF0000',
+        yAxis: 'btc-axis',
+        data: bearPrices[name]
+    });
+    }
+}
+ bearPrices[name].push(jsondata.bearPrices[name])
+ toout += "<br>" + name + ": %" + (Math.round(jsondata.bearPrices[name][1] * 1000)/1000)
+ for (var series in chart2.series){
+ if (chart2.series[series].name == name){
+ chart2.series[series].setData(bearPrices[name]);
+ }
+ }
+               
+
+i++;
+}
+$('#LTs').html(toout)
         })
     }, 60000);
 })
