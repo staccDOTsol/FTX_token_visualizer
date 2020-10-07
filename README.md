@@ -1,3 +1,9 @@
+# New, much more profitable bot available in return for referral link use:
+
+https://hacks.substack.com/p/huobi-trader-live-now-we-watch
+
+
+
 app.py is this strategyy automated:
 
 From the Markets tab (doing this manually) you would click on Leveraged Tokens, click the box that says X3 only and then pull back every % increase on day so far (resets at midnight GMT).  Only BULLSHIT and %BULL/USD are needed 
